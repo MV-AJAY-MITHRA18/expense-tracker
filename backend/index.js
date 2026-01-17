@@ -27,6 +27,22 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+const HOST = '0.0.0.0'; // Listen on all network interfaces
+
+const server = app.listen(PORT, HOST, () => {
+  console.log(`✅ Server running on http://${HOST}:${PORT}`);
+  console.log(`📱 For mobile testing, use: http://YOUR_LOCAL_IP:${PORT}`);
+});
+
+// Keep the server running
+server.on('error', (err) => {
+  console.error('❌ Server error:', err);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('❌ Uncaught exception:', err);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('❌ Unhandled rejection:', err);
 });

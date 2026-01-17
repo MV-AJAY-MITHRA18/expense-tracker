@@ -261,4 +261,8 @@ export const styles = StyleSheet.create({
   transactionsListContent: {
     paddingBottom: 20,
   },
+  listContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
 });

@@ -1,34 +1,31 @@
 const fs = require('fs');
 const path = require('path');
-const mysql = require('mysql2/promise');
-
-// Update with your MySQL credentials
-const dbConfig = {
-  host: 'localhost',
-  user: 'root',
-  password: '',   // your MySQL password
-  database: 'testdb' // change to your database name
-};
+const { Pool } = require('pg');
+require('dotenv').config();
 
 async function runMigrations() {
-  const connection = await mysql.createConnection(dbConfig);
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+  });
 
   try {
-    const migrationsDir = path.join(__dirname, 'migrations');
+    const migrationsDir = path.join(__dirname, '..', 'migrations');
     const files = fs.readdirSync(migrationsDir).sort();
 
     for (const file of files) {
+      if (!file.endsWith('.sql')) continue;
       const filePath = path.join(migrationsDir, file);
       const sql = fs.readFileSync(filePath, 'utf8');
       console.log(`Running migration: ${file}`);
-      await connection.query(sql);
+      await pool.query(sql);
     }
 
     console.log('✅ All migrations applied successfully!');
   } catch (err) {
     console.error('❌ Migration error:', err);
   } finally {
-    await connection.end();
+    await pool.end();
   }
 }
 
